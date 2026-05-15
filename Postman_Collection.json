@@ -1,0 +1,361 @@
+{
+  "info": {
+    "name": "Asset & Ticket Management API - Admin Access Control Tests",
+    "description": "Comprehensive test suite for admin-only access controls",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "ASSET SERVICE",
+      "item": [
+        {
+          "name": "✅ Test 1: Create Asset (User)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"MacBook Pro\",\n  \"type\": \"Laptop\",\n  \"status\": \"active\",\n  \"serial_number\": \"SN12345\",\n  \"assigned_to\": \"user123\"\n}"
+            },
+            "url": {
+              "raw": "{{asset_service_url}}/assets/",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 2: List Assets (User)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{asset_service_url}}/assets/",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 3: Get Asset Stats (User)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{asset_service_url}}/assets/stats",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 4: Update Asset (ADMIN - SUCCESS)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"maintenance\",\n  \"assigned_to\": \"user456\"\n}"
+            },
+            "url": {
+              "raw": "{{asset_service_url}}/assets/1",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test 5: Update Asset (USER - DENIED)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"maintenance\"\n}"
+            },
+            "url": {
+              "raw": "{{asset_service_url}}/assets/1",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 6: Delete Asset (ADMIN - SUCCESS)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{asset_service_url}}/assets/1",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test 7: Delete Asset (USER - DENIED)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{asset_service_url}}/assets/2",
+              "host": ["{{asset_service_url}}"],
+              "path": ["assets", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TICKET SERVICE",
+      "item": [
+        {
+          "name": "✅ Test 8: Create Ticket (User)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Internet Down\",\n  \"description\": \"Cannot connect to WiFi\",\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 9: List Tickets (User)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 10: Get Ticket Stats (User)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/stats",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 11: Update Ticket (ADMIN - SUCCESS)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\",\n  \"priority\": \"low\"\n}"
+            },
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/1",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test 12: Update Ticket (USER - DENIED)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}"
+            },
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/1",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "✅ Test 13: Delete Ticket (ADMIN - SUCCESS)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admin_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/1",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "❌ Test 14: Delete Ticket (USER - DENIED)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{ticket_service_url}}/tickets/2",
+              "host": ["{{ticket_service_url}}"],
+              "path": ["tickets", "2"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "asset_service_url",
+      "value": "http://localhost:5002",
+      "type": "string"
+    },
+    {
+      "key": "ticket_service_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "YOUR_ADMIN_JWT_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "user_token",
+      "value": "YOUR_USER_JWT_TOKEN_HERE",
+      "type": "string"
+    }
+  ]
+}
