@@ -1,6 +1,4 @@
 # Asset Service — Python dependencies
-# Install with: pip install -r requirements.txt
-
 Flask>=2.3
 Flask-Cors>=3.1.0
 Flask-SQLAlchemy>=3.1.0
@@ -9,5 +7,6 @@ SQLAlchemy>=2.0
 psycopg2-binary>=2.9
 PyJWT>=2.8.0
 python-dotenv>=1.0
+requests>=2.31.0
 gunicorn
-eventlet
+eventlet>=0.33.0
