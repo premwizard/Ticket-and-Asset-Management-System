@@ -9,3 +9,5 @@ SQLAlchemy>=2.0
 psycopg2-binary>=2.9
 PyJWT>=2.8.0
 python-dotenv>=1.0
+gunicorn
+eventlet

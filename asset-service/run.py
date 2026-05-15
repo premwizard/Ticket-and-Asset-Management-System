@@ -16,10 +16,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-required_vars = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD', 'SUPABASE_JWT_SECRET', 'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'FLASK_ENV', 'FLASK_PORT']
+required_vars = ['SUPABASE_JWT_SECRET', 'SUPABASE_URL', 'SUPABASE_ANON_KEY', 'FLASK_ENV', 'FLASK_PORT']
 for var in required_vars:
     if not os.getenv(var):
         raise RuntimeError(f"Missing required env var: {var}")
+
+# DB check: Require either DATABASE_URL or the full set of separate variables
+db_vars = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD']
+if not os.getenv('DATABASE_URL'):
+    for var in db_vars:
+        if not os.getenv(var):
+            raise RuntimeError(f"Missing required env var: {var} (or DATABASE_URL)")
 
 from app import create_app
 from app.config.settings import settings

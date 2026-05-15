@@ -57,9 +57,9 @@ def create_app() -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
 
-    # ── CORS — Allow ALL origins in development ────────────────────────────
+    # ── CORS — Allow configured origins ─────────────────────────────────────
     CORS(app,
-         resources={r"/*": {"origins": "*"}},
+         resources={r"/*": {"origins": settings.CORS_ORIGINS}},
          allow_headers=["Authorization", "Content-Type", "Accept"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
          supports_credentials=False)
@@ -71,7 +71,14 @@ def create_app() -> Flask:
     # Force CORS headers on EVERY response — belt and suspenders
     @app.after_request
     def add_cors_headers(response):
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        # Use first origin as default if multiple, though CORS extension handles this better
+        # For simplicity in after_request, we can echo the Origin if it's in our allowed list
+        origin = request.headers.get('Origin')
+        if origin in settings.CORS_ORIGINS:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        elif "*" in settings.CORS_ORIGINS:
+            response.headers['Access-Control-Allow-Origin'] = "*"
+            
         response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, Accept'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         return response
@@ -81,7 +88,12 @@ def create_app() -> Flask:
     @app.route('/<path:path>', methods=['OPTIONS'])
     def options_handler(path):
         response = jsonify({})
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        origin = request.headers.get('Origin')
+        if origin in settings.CORS_ORIGINS:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        elif "*" in settings.CORS_ORIGINS:
+            response.headers['Access-Control-Allow-Origin'] = "*"
+            
         response.headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, Accept'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         return response, 200
