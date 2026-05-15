@@ -42,16 +42,21 @@ def create_app() -> Flask:
     app.url_map.strict_slashes = False
 
     # ── SQLAlchemy config ──────────────────────────────────────────────────
-    app.config["SQLALCHEMY_DATABASE_URI"] = settings.SQLALCHEMY_DATABASE_URI
+    db_uri = settings.SQLALCHEMY_DATABASE_URI
+    # Log database connection attempt (redacting credentials)
+    db_host = db_uri.split("@")[-1] if "@" in db_uri else "local"
+    logger.info("Connecting to Database at %s...", db_host)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_size":    settings.DB_POOL_SIZE,
-        "max_overflow": settings.DB_MAX_OVERFLOW,
-        "pool_pre_ping": True,    # Reconnect if connection is stale
-        "pool_timeout":  5,       # Fail fast if pool is exhausted
-        "pool_recycle":  300,     # Refresh connections every 5 minutes
+        "pool_size":     settings.DB_POOL_SIZE,
+        "max_overflow":  settings.DB_MAX_OVERFLOW,
+        "pool_timeout":  settings.DB_POOL_TIMEOUT,
+        "pool_recycle":  settings.DB_POOL_RECYCLE,
+        "pool_pre_ping": True,
         "connect_args": {
-            "connect_timeout": 5, # 5s max to establish DB connection
+            "connect_timeout": 10,
         },
     }
     db.init_app(app)

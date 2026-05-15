@@ -27,6 +27,9 @@ class Settings:
     DATABASE_USER:     str = os.getenv("DATABASE_USER",     "postgres")
     DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "postgres")
     DB_POOL_SIZE:      int = int(os.getenv("DB_POOL_SIZE",  "5"))
+    DB_MAX_OVERFLOW:   int = int(os.getenv("DB_MAX_OVERFLOW", "10"))
+    DB_POOL_TIMEOUT:   int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
+    DB_POOL_RECYCLE:   int = int(os.getenv("DB_POOL_RECYCLE", "1800"))
     DATABASE_URL:      str = os.getenv("DATABASE_URL",      "")
 
     @property
