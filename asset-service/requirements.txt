@@ -10,3 +10,4 @@ python-dotenv>=1.0
 requests>=2.31.0
 gunicorn
 eventlet>=0.33.0
+cryptography>=42.0.0
