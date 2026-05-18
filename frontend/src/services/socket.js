@@ -17,8 +17,8 @@ class SocketService {
     this.socket = io(SOCKET_URL, {
       auth: { token },
       query: { token: `Bearer ${token}` }, // Fallback for some middleware setups
-      transports: ['polling', 'websocket'], // Prioritize polling first for instant connection, then upgrade to websocket
-      timeout: 60000, // Increase connection timeout to 60s for Render cold-starts
+      transports: ['websocket'], // Force WebSocket transport only to bypass sticky-session requirements on cloud platforms
+      timeout: 60000, // Keep connection timeout at 60s for Render cold-starts
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 2000,
