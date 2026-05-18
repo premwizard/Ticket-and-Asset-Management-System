@@ -53,7 +53,7 @@ class User(db.Model):
 def create_user_record(supabase_id: str, email: str, role: str = "user") -> None:
     """
     Upsert a local user record.
-    If user exists, updates email, role, and updated_at.
+    If user exists, updates email, role, and updated_at ONLY if changed.
     Otherwise creates a new record.
 
     Args:
@@ -68,16 +68,21 @@ def create_user_record(supabase_id: str, email: str, role: str = "user") -> None
 
         existing = User.query.filter_by(supabase_id=supabase_id).first()
         if existing:
-            existing.email = email
-            existing.role = role
-            # updated_at handled by SQLAlchemy onupdate
-            logger.debug("Updated local user record for %s", supabase_id)
+            # ONLY execute write & commit if data has actually changed!
+            if existing.email != email or existing.role != role:
+                existing.email = email
+                existing.role = role
+                db.session.commit()
+                logger.info("Updated local user record for %s", supabase_id)
+            else:
+                # Direct read-only pass-through: NO DB WRITE, NO COMMIT!
+                logger.debug("Local user record for %s is up to date (no-op)", supabase_id)
         else:
             user = User(supabase_id=supabase_id, email=email, role=role)
             db.session.add(user)
+            db.session.commit()
             logger.info("Created local user record for %s (%s)", supabase_id, email)
         
-        db.session.commit()
     except Exception as exc:
         db.session.rollback()
         logger.error("Failed to sync user record: %s", exc)

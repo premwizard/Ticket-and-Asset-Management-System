@@ -61,15 +61,21 @@ def create_user_record(supabase_id: str, email: str, role: str = "user") -> None
     try:
         existing = User.query.filter_by(supabase_id=supabase_id).first()
         if existing:
-            existing.email = email
-            existing.role = role
-            logger.debug("Asset service: updated user record for %s", supabase_id)
+            # ONLY execute write & commit if data has actually changed!
+            if existing.email != email or existing.role != role:
+                existing.email = email
+                existing.role = role
+                db.session.commit()
+                logger.info("Asset service: updated user record for %s", supabase_id)
+            else:
+                # Direct read-only pass-through: NO DB WRITE, NO COMMIT!
+                logger.debug("Asset service: user record for %s is up to date (no-op)", supabase_id)
         else:
             user = User(supabase_id=supabase_id, email=email, role=role)
             db.session.add(user)
+            db.session.commit()
             logger.info("Asset service: created user record for %s", supabase_id)
             
-        db.session.commit()
     except Exception as exc:
         db.session.rollback()
         logger.error("Asset service: failed to sync user record: %s", exc)

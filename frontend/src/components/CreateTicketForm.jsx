@@ -90,7 +90,6 @@ export default function CreateTicketForm({ onSuccess, onCancel }) {
   const validate = () => {
     const errs = {};
     if (!form.title.trim()) errs.title = 'Identity label required';
-    if (!form.project_id) errs.project_id = 'Project mapping required';
     return errs;
   };
 
@@ -132,7 +131,7 @@ export default function CreateTicketForm({ onSuccess, onCancel }) {
       console.log('[CREATE] Initializing operational request...');
       const ticket = await ticketsApi.create({
         ...form,
-        project_id: parseInt(form.project_id)
+        project_id: form.project_id ? parseInt(form.project_id) : null
       });
       console.log(`[CREATE] ✅ Logic ID assigned: ${ticket.id}`);
 
@@ -287,17 +286,14 @@ export default function CreateTicketForm({ onSuccess, onCancel }) {
           <div className="grid grid-cols-2 gap-8">
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                Project Logic <span className="text-red-500">*</span>
+                Project Logic
               </label>
               <div className="relative">
                 <select 
                   name="project_id"
                   value={form.project_id}
                   onChange={handleChange}
-                  className={cn(
-                    "input-premium h-14 appearance-none pr-10",
-                    errors.project_id && "border-red-500 ring-4 ring-red-500/10"
-                  )}
+                  className="input-premium h-14 appearance-none pr-10"
                 >
                   <option value="">Select Project</option>
                   {projects.map(p => (
@@ -306,7 +302,6 @@ export default function CreateTicketForm({ onSuccess, onCancel }) {
                 </select>
                 <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
               </div>
-              {errors.project_id && <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest ml-1">{errors.project_id}</p>}
             </div>
             <div className="space-y-3">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">Priority Protocol</label>

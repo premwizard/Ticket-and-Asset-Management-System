@@ -23,7 +23,7 @@ export const apiCall = async (url, options = {}) => {
   
   const token = await getToken()
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), options.timeout || 10000)
+  const timer = setTimeout(() => controller.abort(), options.timeout || 60000)
 
   try {
     const res = await fetch(resolvedUrl, {

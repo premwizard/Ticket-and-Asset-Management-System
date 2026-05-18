@@ -126,6 +126,24 @@
   .table-saas tr:hover td {
     @apply bg-neutral-50/50 dark:bg-neutral-800/30;
   }
+
+  /* Premium Form Styles for Ticket Creation Modal */
+  .input-premium {
+    @apply w-full px-5 rounded-2xl bg-neutral-900/90 border border-neutral-800 text-white placeholder-neutral-500 outline-none transition-all duration-300 focus:border-neutral-500 focus:ring-2 focus:ring-neutral-800/50;
+  }
+  
+  .input-premium option {
+    background-color: #0c0c0e !important;
+    color: #ffffff !important;
+  }
+
+  .btn-primary {
+    @apply flex items-center justify-center gap-2 px-6 font-bold text-sm bg-white text-neutral-950 hover:bg-neutral-100 transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply flex items-center justify-center gap-2 px-6 font-bold text-sm bg-neutral-900 border border-neutral-800 text-neutral-100 hover:bg-neutral-800 hover:text-white transition-all duration-300 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
 }
 
 /* Subtle Transitions */
