@@ -52,7 +52,13 @@ class Settings:
     @property
     def CORS_ORIGINS(self) -> list[str]:
         # Include production frontend and localhost for development
-        default_origins = "https://your-frontend.vercel.app,http://localhost:5173,http://localhost:3000"
+        default_origins = (
+            "https://ticket-and-asset-management-system-dwf2clyjf.vercel.app,"
+            "https://ticket-and-asset-management-system-dwf2clyjf.vercel.app/,"
+            "https://your-frontend.vercel.app,"
+            "http://localhost:5173,"
+            "http://localhost:3000"
+        )
         raw = os.getenv("CORS_ORIGINS", default_origins)
         return [o.strip() for o in raw.split(",")]
 
