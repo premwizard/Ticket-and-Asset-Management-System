@@ -59,42 +59,60 @@ export const NotificationProvider = ({ children }) => {
   }, [session, fetchNotifications]);
 
   const markAsRead = async (id) => {
+    // Optimistically transition state instantly for a premium SaaS feel
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    setUnreadCount(prev => Math.max(0, prev - 1));
+
     try {
       await axios.put(`${API_BASE}/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
-      setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
-      console.error('[NOTIF] Mark read error:', err);
+      console.warn('[NOTIF] Syncing read state with backend failed (likely out-of-sync database):', err.message);
     }
   };
 
   const markAllRead = async () => {
+    // Optimistically mark all read immediately
+    const originalNotifications = [...notifications];
+    const originalUnreadCount = unreadCount;
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setUnreadCount(0);
+
     try {
       await axios.put(`${API_BASE}/read-all`, {}, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-      setUnreadCount(0);
     } catch (err) {
-      console.error('[NOTIF] Mark all read error:', err);
+      console.warn('[NOTIF] Syncing read-all state with backend failed:', err.message);
+      setNotifications(originalNotifications);
+      setUnreadCount(originalUnreadCount);
     }
   };
 
   const deleteNotification = async (id) => {
+    // Save original state in case of a non-404 network failure
+    const originalNotifications = [...notifications];
+    const originalUnreadCount = unreadCount;
+
+    // Optimistically remove notification instantly
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    setUnreadCount(prev => {
+      const wasUnread = notifications.find(n => n.id === id && !n.is_read);
+      return wasUnread ? Math.max(0, prev - 1) : prev;
+    });
+
     try {
       await axios.delete(`${API_BASE}/${id}`, {
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
-      setNotifications(prev => prev.filter(n => n.id !== id));
-      // Re-calculate unread count if needed
-      setUnreadCount(prev => {
-        const wasUnread = notifications.find(n => n.id === id && !n.is_read);
-        return wasUnread ? Math.max(0, prev - 1) : prev;
-      });
     } catch (err) {
-      console.error('[NOTIF] Delete error:', err);
+      console.warn('[NOTIF] Syncing deletion with backend failed:', err.message);
+      // Revert only if it is a real server error (not a 404 indicating it's already gone)
+      if (err.response && err.response.status !== 404) {
+        setNotifications(originalNotifications);
+        setUnreadCount(originalUnreadCount);
+      }
     }
   };
 

@@ -17,10 +17,11 @@ class SocketService {
     this.socket = io(SOCKET_URL, {
       auth: { token },
       query: { token: `Bearer ${token}` }, // Fallback for some middleware setups
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'], // Prioritize polling first for instant connection, then upgrade to websocket
+      timeout: 60000, // Increase connection timeout to 60s for Render cold-starts
       reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
     });
 
     this.socket.on('connect', () => {

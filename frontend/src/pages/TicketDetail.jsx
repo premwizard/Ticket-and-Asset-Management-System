@@ -45,6 +45,11 @@ export default function TicketDetail() {
   const [submitting, setSubmitting] = useState(false);
 
   const fetchData = useCallback(async () => {
+    if (!id || id === 'undefined' || id === 'null') {
+      setError('The requested resource identifier is invalid or missing.');
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const [ticketData, projectsData] = await Promise.all([
