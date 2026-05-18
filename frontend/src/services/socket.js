@@ -4,7 +4,7 @@
 
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:5001'; // Ticket Service URL
+const SOCKET_URL = import.meta.env.VITE_TICKET_API_URL || 'http://localhost:5001'; // Ticket Service URL
 
 class SocketService {
   constructor() {

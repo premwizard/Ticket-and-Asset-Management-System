@@ -25,8 +25,8 @@ def verify_supabase_token(token):
     public_key = None
     for key in jwks.get('keys', []):
       if key.get('kid') == kid:
-        from jwt.algorithms import ECAlgorithm
-        public_key = ECAlgorithm.from_jwk(key)
+        jwk = jwt.PyJWK(key)
+        public_key = jwk.key
         break
 
     if not public_key:

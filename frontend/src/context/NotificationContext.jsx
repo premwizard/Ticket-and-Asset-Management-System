@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const NotificationContext = createContext(null);
 
-const API_BASE = 'http://localhost:5001/notifications';
+const API_BASE = `${import.meta.env.VITE_TICKET_API_URL || 'http://localhost:5001'}/notifications`;
 
 export const NotificationProvider = ({ children }) => {
   const { session, user, isAdmin } = useAuth();

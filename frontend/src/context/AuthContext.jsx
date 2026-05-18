@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { supabase } from '../services/supabase'
 import axios from 'axios'
 
-const TICKET_SERVICE_URL = 'http://localhost:5001'
+const TICKET_SERVICE_URL = import.meta.env.VITE_TICKET_API_URL || 'http://localhost:5001'
 
 const AuthContext = createContext(null)
 

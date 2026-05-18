@@ -8,15 +8,25 @@ const getToken = async () => {
   return session.access_token
 }
 
+const TICKET_API_BASE = import.meta.env.VITE_TICKET_API_URL || 'http://localhost:5001';
+const ASSET_API_BASE = import.meta.env.VITE_ASSET_API_URL || 'http://localhost:5002';
+
 export const apiCall = async (url, options = {}) => {
-  console.log(`[API] ▶ ${options.method || 'GET'} ${url}`)
+  let resolvedUrl = url;
+  if (url.startsWith('/api/tickets') || url.startsWith('/api/projects')) {
+    resolvedUrl = `${TICKET_API_BASE}${url.replace(/^\/api/, '')}`;
+  } else if (url.startsWith('/api/assets')) {
+    resolvedUrl = `${ASSET_API_BASE}${url.replace(/^\/api/, '')}`;
+  }
+
+  console.log(`[API] ▶ ${options.method || 'GET'} ${resolvedUrl}`)
   
   const token = await getToken()
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), options.timeout || 10000)
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(resolvedUrl, {
       ...options,
       signal: controller.signal,
       headers: {
@@ -27,22 +37,22 @@ export const apiCall = async (url, options = {}) => {
     })
     clearTimeout(timer)
 
-    console.log(`[API] ◀ ${res.status} ${url}`)
+    console.log(`[API] ◀ ${res.status} ${resolvedUrl}`)
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
       if (body.debug) {
-        console.error(`[API DEBUG INFO from ${url}]:`, body.debug)
+        console.error(`[API DEBUG INFO from ${resolvedUrl}]:`, body.debug)
       }
       throw new Error(
-        body.message || body.error || `HTTP ${res.status} on ${url}`
+        body.message || body.error || `HTTP ${res.status} on ${resolvedUrl}`
       )
     }
     return res.json()
   } catch (err) {
     clearTimeout(timer)
     if (err.name === 'AbortError') {
-      throw new Error(`Timeout: ${url} — backend down?`)
+      throw new Error(`Timeout: ${resolvedUrl} — backend down?`)
     }
     throw err
   }
@@ -78,13 +88,14 @@ export const attachmentsApi = {
     const formData = new FormData()
     formData.append('file', file)
 
-    console.log(`[UPLOAD] ${file.name} → ticket ${ticketId}`)
+    const uploadUrl = `${TICKET_API_BASE}/tickets/${ticketId}/attachments`;
+    console.log(`[UPLOAD] ${file.name} → ticket ${ticketId} URL: ${uploadUrl}`)
 
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 60000) // 60s for large files
 
     try {
-      const res = await fetch(`/api/tickets/${ticketId}/attachments`, {
+      const res = await fetch(uploadUrl, {
         method: 'POST',
         signal: controller.signal,
         headers: {
