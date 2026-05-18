@@ -13,6 +13,9 @@ This factory pattern makes the app testable and configurable
 for different environments without singletons.
 """
 
+import eventlet
+eventlet.monkey_patch()
+
 import logging
 
 from flask import Flask, jsonify, g, request

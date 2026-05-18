@@ -9,6 +9,9 @@ Usage:
   python run.py
 """
 
+import eventlet
+eventlet.monkey_patch()
+
 import logging
 import sys
 
