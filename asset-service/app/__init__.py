@@ -64,7 +64,7 @@ def create_app() -> Flask:
          resources={r"/*": {"origins": settings.CORS_ORIGINS}},
          allow_headers=["Authorization", "Content-Type", "Accept"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-         supports_credentials=False)
+         supports_credentials=True)
 
     import re
 
@@ -88,6 +88,7 @@ def create_app() -> Flask:
         origin = request.headers.get('Origin')
         if is_origin_allowed(origin):
             response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
         elif "*" in settings.CORS_ORIGINS:
             response.headers['Access-Control-Allow-Origin'] = "*"
             
@@ -103,6 +104,7 @@ def create_app() -> Flask:
         origin = request.headers.get('Origin')
         if is_origin_allowed(origin):
             response.headers['Access-Control-Allow-Origin'] = origin
+            response.headers['Access-Control-Allow-Credentials'] = 'true'
         elif "*" in settings.CORS_ORIGINS:
             response.headers['Access-Control-Allow-Origin'] = "*"
             

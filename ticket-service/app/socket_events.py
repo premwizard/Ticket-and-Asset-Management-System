@@ -11,12 +11,18 @@ import logging
 logger = logging.getLogger(__name__)
 
 @socketio.on('connect')
-def handle_connect():
+def handle_connect(auth=None):
     """
     Handle new socket connections.
     Validates JWT token passed in auth payload or headers.
     """
-    token = request.args.get('token') or request.headers.get('Authorization')
+    token = None
+    if auth and isinstance(auth, dict):
+        token = auth.get('token')
+        
+    if not token:
+        token = request.args.get('token') or request.headers.get('Authorization')
+        
     if token and token.startswith('Bearer '):
         token = token.split(' ')[1]
     

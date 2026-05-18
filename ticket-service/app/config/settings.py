@@ -53,6 +53,8 @@ class Settings:
     def CORS_ORIGINS(self) -> list[str]:
         # Include production frontend and localhost for development
         default_origins = (
+            "https://ticket-and-asset-management-system-premwizards-projects.vercel.app,"
+            "https://ticket-and-asset-management-system-premwizards-projects.vercel.app/,"
             r"https://ticket-and-asset-management-system-.*\.vercel\.app,"
             r"https://ticket-and-asset-management-system-.*\.vercel\.app/,"
             "https://ticket-and-asset-management-system.vercel.app,"

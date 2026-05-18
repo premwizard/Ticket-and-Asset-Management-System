@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 # Initialize SocketIO without app context first
 # We use eventlet as the async mode for high performance
 socketio = SocketIO(
-    cors_allowed_origins=settings.CORS_ORIGINS,
+    cors_allowed_origins="*",
     async_mode='eventlet',
     logger=True,
     engineio_logger=True,
