@@ -67,8 +67,45 @@ def create_app() -> Flask:
     migrate.init_app(app, db)
 
     # ── CORS — Allow configured origins ─────────────────────────────────────
+    import re
+
+    # Define robust allowed origins list with compiled regex patterns
+    allowed_origins = [
+        "https://ticket-and-asset-management-system-premwizards-projects.vercel.app",
+        re.compile(r"^https://ticket-and-asset-management-system-.*\.vercel\.app$"),
+        "https://ticket-and-asset-management-system.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ]
+
+    # Dynamically inject settings.CORS_ORIGINS to ensure environment variables are respected
+    for o in settings.CORS_ORIGINS:
+        if o not in allowed_origins:
+            if "*" in o or ".*" in o or "\\" in o:
+                try:
+                    # Strip any raw prefix or compile directly
+                    clean_pattern = o.replace("r'", "").replace("'", "")
+                    allowed_origins.append(re.compile(clean_pattern))
+                except Exception:
+                    allowed_origins.append(o)
+            else:
+                allowed_origins.append(o)
+
+    def is_origin_allowed(origin):
+        if not origin:
+            return False
+        for allowed in allowed_origins:
+            if isinstance(allowed, re.Pattern):
+                if allowed.match(origin):
+                    return True
+            else:
+                if origin == allowed or origin.rstrip("/") == allowed.rstrip("/"):
+                    return True
+        return False
+
+    # ── CORS — Allow configured origins ─────────────────────────────────────
     CORS(app,
-         resources={r"/*": {"origins": settings.CORS_ORIGINS}},
+         resources={r"/*": {"origins": allowed_origins}},
          allow_headers=["Authorization", "Content-Type", "Accept"],
          methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
          supports_credentials=True)
@@ -76,22 +113,6 @@ def create_app() -> Flask:
     # ── Socket.IO ──────────────────────────────────────────────────────────
     init_socketio(app)
     from . import socket_events
-
-    import re
-
-    def is_origin_allowed(origin):
-        if not origin:
-            return False
-        if origin in settings.CORS_ORIGINS:
-            return True
-        for allowed in settings.CORS_ORIGINS:
-            try:
-                pattern = allowed if allowed.startswith("^") else f"^{allowed}$"
-                if re.match(pattern, origin):
-                    return True
-            except Exception:
-                pass
-        return False
 
     # Force CORS headers on EVERY response — belt and suspenders
     @app.after_request
