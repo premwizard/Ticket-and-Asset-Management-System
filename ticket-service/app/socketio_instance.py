@@ -1,18 +1,21 @@
 """
-app/socketio_instance.py — Flask-SocketIO Initialization
+app/socketio_instance.py — Production-ready Flask-SocketIO Initialization
 """
 
 from flask_socketio import SocketIO
 import logging
 
-from app.config.settings import settings
-
 logger = logging.getLogger(__name__)
 
-# Initialize SocketIO without app context first
-# We use eventlet as the async mode for high performance
+# Initialize SocketIO without app context first.
+# Enabled with Eventlet async mode, proper origins, and production logs.
 socketio = SocketIO(
-    cors_allowed_origins="*",
+    cors_allowed_origins=[
+        "https://ticket-and-asset-management-system-premwizards-projects.vercel.app",
+        "https://ticket-and-asset-management-system.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000"
+    ],
     async_mode='eventlet',
     logger=True,
     engineio_logger=True,
@@ -21,7 +24,7 @@ socketio = SocketIO(
 )
 
 def init_socketio(app):
-    """Binds SocketIO to the Flask app."""
+    """Binds SocketIO to the Flask application instance."""
     socketio.init_app(app)
-    logger.info("Socket.IO initialized with eventlet")
+    logger.info("[SOCKET] Production Socket.IO initialized with eventlet successfully.")
     return socketio
