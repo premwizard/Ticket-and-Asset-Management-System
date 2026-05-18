@@ -31,6 +31,9 @@ export const apiCall = async (url, options = {}) => {
 
     if (!res.ok) {
       const body = await res.json().catch(() => ({}))
+      if (body.debug) {
+        console.error(`[API DEBUG INFO from ${url}]:`, body.debug)
+      }
       throw new Error(
         body.message || body.error || `HTTP ${res.status} on ${url}`
       )

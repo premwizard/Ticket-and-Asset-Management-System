@@ -38,7 +38,7 @@ export default defineConfig({
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
         '/api/assets': {
-          target: 'http://localhost:5002',
+          target: 'https://asset-service-ifek.onrender.com',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },

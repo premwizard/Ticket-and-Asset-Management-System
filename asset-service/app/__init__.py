@@ -35,12 +35,16 @@ def create_app() -> Flask:
     app.url_map.strict_slashes = False
 
     # ── SQLAlchemy ─────────────────────────────────────────────────────────
-    db_uri = settings.SQLALCHEMY_DATABASE_URI
-    # Log database connection attempt (redacting credentials)
-    db_host = db_uri.split("@")[-1] if "@" in db_uri else "local"
-    logger.info("Connecting to Database at %s...", db_host)
+    import os
+    DATABASE_URL = os.getenv("DATABASE_URL")
+    if not DATABASE_URL:
+        raise RuntimeError("DATABASE_URL is missing")
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
+    # Handle Render's "postgres://" prefix which is incompatible with SQLAlchemy 1.4+
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_size":     settings.DB_POOL_SIZE,

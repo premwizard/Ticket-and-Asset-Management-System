@@ -21,12 +21,10 @@ for var in required_vars:
     if not os.getenv(var):
         raise RuntimeError(f"Missing required env var: {var}")
 
-# DB check: Require either DATABASE_URL or the full set of separate variables
-db_vars = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'DATABASE_PASSWORD']
-if not os.getenv('DATABASE_URL'):
-    for var in db_vars:
-        if not os.getenv(var):
-            raise RuntimeError(f"Missing required env var: {var} (or DATABASE_URL)")
+# DB check: Enforce that DATABASE_URL exists
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is missing")
 
 from app import create_app
 from app.config.settings import settings

@@ -13,26 +13,18 @@ class Settings:
     FLASK_DEBUG: bool = os.getenv("FLASK_DEBUG", "1") == "1"
     FLASK_PORT:  int  = int(os.getenv("FLASK_PORT", "5002"))
 
-    DATABASE_HOST:     str = os.getenv("DATABASE_HOST",     "localhost")
-    DATABASE_PORT:     int = int(os.getenv("DATABASE_PORT", "5432"))
-    DATABASE_NAME:     str = os.getenv("DATABASE_NAME",     "asset_db")
-    DATABASE_USER:     str = os.getenv("DATABASE_USER",     "postgres")
-    DATABASE_PASSWORD: str = os.getenv("DATABASE_PASSWORD", "postgres")
+    DATABASE_URL:      str = os.getenv("DATABASE_URL")
     DB_POOL_SIZE:      int = int(os.getenv("DB_POOL_SIZE",  "5"))
     DB_MAX_OVERFLOW:   int = int(os.getenv("DB_MAX_OVERFLOW", "10"))
     DB_POOL_TIMEOUT:   int = int(os.getenv("DB_POOL_TIMEOUT", "30"))
     DB_POOL_RECYCLE:   int = int(os.getenv("DB_POOL_RECYCLE", "1800"))
-    DATABASE_URL:      str = os.getenv("DATABASE_URL",      "")
 
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
-        # Prioritize DATABASE_URL (Standard for Render/Heroku)
+        """Constructs the PostgreSQL connection URL for SQLAlchemy."""
         url = self.DATABASE_URL
         if not url:
-            url = (
-                f"postgresql://{self.DATABASE_USER}:{self.DATABASE_PASSWORD}"
-                f"@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
-            )
+            raise RuntimeError("DATABASE_URL is missing")
 
         # Handle Render's "postgres://" prefix which is incompatible with SQLAlchemy 1.4+
         if url.startswith("postgres://"):
