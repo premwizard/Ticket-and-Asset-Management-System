@@ -1,36 +1,33 @@
 import jwt
+from jwt import PyJWKClient
 import requests
 import os
 from functools import wraps
 from flask import request, jsonify, g
 
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-_jwks_cache = None
+# Startup verification log
+try:
+    import cryptography
+    print("Cryptography Installed Successfully")
+except ImportError:
+    print("WARNING: cryptography library is not installed!")
 
-def get_jwks():
-  global _jwks_cache
-  if _jwks_cache:
-    return _jwks_cache
-  url = f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json"
-  response = requests.get(url, timeout=5)
-  _jwks_cache = response.json()
-  return _jwks_cache
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+_jwk_client = None
+
+def get_jwk_client():
+    global _jwk_client
+    if _jwk_client:
+        return _jwk_client
+    url = f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json"
+    _jwk_client = PyJWKClient(url)
+    return _jwk_client
 
 def verify_supabase_token(token):
   try:
-    jwks = get_jwks()
-    header = jwt.get_unverified_header(token)
-    kid = header.get('kid')
-
-    public_key = None
-    for key in jwks.get('keys', []):
-      if key.get('kid') == kid:
-        jwk = jwt.PyJWK(key)
-        public_key = jwk.key
-        break
-
-    if not public_key:
-      raise Exception('Public key not found in JWKS')
+    client = get_jwk_client()
+    signing_key = client.get_signing_key_from_jwt(token)
+    public_key = signing_key.key
 
     payload = jwt.decode(
       token,
