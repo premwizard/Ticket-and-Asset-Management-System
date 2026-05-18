@@ -77,13 +77,27 @@ def create_app() -> Flask:
     init_socketio(app)
     from . import socket_events
 
+    import re
+
+    def is_origin_allowed(origin):
+        if not origin:
+            return False
+        if origin in settings.CORS_ORIGINS:
+            return True
+        for allowed in settings.CORS_ORIGINS:
+            try:
+                pattern = allowed if allowed.startswith("^") else f"^{allowed}$"
+                if re.match(pattern, origin):
+                    return True
+            except Exception:
+                pass
+        return False
+
     # Force CORS headers on EVERY response — belt and suspenders
     @app.after_request
     def add_cors_headers(response):
-        # Use first origin as default if multiple, though CORS extension handles this better
-        # For simplicity in after_request, we can echo the Origin if it's in our allowed list
         origin = request.headers.get('Origin')
-        if origin in settings.CORS_ORIGINS:
+        if is_origin_allowed(origin):
             response.headers['Access-Control-Allow-Origin'] = origin
         elif "*" in settings.CORS_ORIGINS:
             response.headers['Access-Control-Allow-Origin'] = "*"
@@ -98,7 +112,7 @@ def create_app() -> Flask:
     def options_handler(path):
         response = jsonify({})
         origin = request.headers.get('Origin')
-        if origin in settings.CORS_ORIGINS:
+        if is_origin_allowed(origin):
             response.headers['Access-Control-Allow-Origin'] = origin
         elif "*" in settings.CORS_ORIGINS:
             response.headers['Access-Control-Allow-Origin'] = "*"

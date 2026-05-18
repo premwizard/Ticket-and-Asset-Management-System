@@ -53,9 +53,9 @@ class Settings:
     def CORS_ORIGINS(self) -> list[str]:
         # Include production frontend and localhost for development
         default_origins = (
-            "https://ticket-and-asset-management-system-dwf2clyjf.vercel.app,"
-            "https://ticket-and-asset-management-system-dwf2clyjf.vercel.app/,"
-            "https://your-frontend.vercel.app,"
+            r"https://ticket-and-asset-management-system-.*\.vercel\.app,"
+            r"https://ticket-and-asset-management-system-.*\.vercel\.app/,"
+            "https://ticket-and-asset-management-system.vercel.app,"
             "http://localhost:5173,"
             "http://localhost:3000"
         )
